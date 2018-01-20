@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.ManagementDao">
+<!-- user查询条件 -->
+	<sql id="getUserList_where">
+		<where>
+			<if test="username != null and username != ''.toString()">
+				 and z.username like CONCAT(CONCAT('%',#{username}),'%')
+			</if>
+			<if test="name != null and name != ''.toString()">
+				 and z.name like CONCAT(CONCAT('%',#{name}),'%')
+			</if>
+		</where>
+	</sql>
+<!--     user列表 -->
+	<select id="getUserList" parameterType="map" resultType="map">
+        select userid,username,name from (
+        select userid,username,name, rownum rn from(
+        
+		select z.userid,z.username,z.name from PT_USER z
+		<include refid="getUserList_where"></include>
+		order by z.intime desc
+		
+		)
+		) where rn  between #{result.start} and #{result.end}
+	
+	</select>
+	
+<!-- 	user列表，总数 -->
+	<select id="getUserListCount" parameterType="map" resultType="long">
+		select count(*)
+		from PT_USER z 
+		<include refid="getUserList_where"></include>
+	</select>
+	
+	
+	
+	<!--     role列表 -->
+	<select id="getRoleList" parameterType="map" resultType="map">
+        select ROLEID,ROLENAME from (
+        select ROLEID,ROLENAME, rownum rn from(
+        
+		select z.ROLEID,z.ROLENAME from PT_ROLE z
+		<include refid="getRoleList_where"></include>
+		order by z.intime desc
+		
+		)
+		) where rn  between #{result.start} and #{result.end}
+	
+	</select>
+	<!-- ROLE查询条件 -->
+	<sql id="getRoleList_where">
+		<where>
+			<if test="rolename != null and rolename != ''.toString()">
+				 and z.rolename like CONCAT(CONCAT('%',#{rolename}),'%')
+			</if>
+			
+		</where>
+	</sql>
+	<!-- 	role列表，总数 -->
+	<select id="getRoleListCount" parameterType="map" resultType="long">
+		select count(*)
+		from PT_ROLE z 
+		<include refid="getRoleList_where"></include>
+	</select>
+	
+<!-- 	查询所有role -->	
+	<select id="getRole"  resultType="map">
+	     SELECT ROLEID,ROLENAME FROM PT_ROLE 
+	</select>
+	
+<!-- 	查询所有depart -->	
+	<select id="getDepart"  resultType="map">
+    	 SELECT d.DEPARTID,d.DEPARTNAME FROM PT_DEPART d
+	</select>
+	
+<!-- 	根据rolid 查询数据 -->
+
+	<select id="getOneData" parameterType="Integer" resultType="map">
+	     SELECT ROLEID,ROLENAME FROM PT_ROLE  where roleid=#{roleid}
+	</select>
+	
+	<update id="updateRole" parameterType="map">
+		UPDATE  PT_ROLE SET ROLENAME =#{rolename} WHERE ROLEID =#{roleid} 
+	</update>
+	
+	<insert id="addRole" parameterType="map">
+		INSERT INTO PT_ROLE(ROLEID,ROLENAME) VALUES(seq_role_menu.NEXTVAL,#{rolename})
+	</insert>
+	
+	<delete id="delRole" parameterType="int">
+	DELETE FROM PT_ROLE Z WHERE Z.ROLEID IN
+	<foreach collection="array" item="list" open="(" separator="," close=")">
+	#{list}
+	</foreach>
+	</delete>
+	<select id="getOneRole" parameterType="map" resultType="map">
+	SELECT R.ROLEID FROM PT_ROLE R WHERE R.ROLENAME =<!-- LIKE CONCAT('%',CONCAT( -->#{rolename}<!-- ,'%')) -->
+	</select>
+</mapper>

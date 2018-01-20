@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.DepartDao">
+<!-- user查询条件 -->
+	<sql id="getDepartList_where">
+		<where>
+			<if test="departname != null and departname != ''.toString()">
+				 and z.departname like CONCAT(CONCAT('%',#{departname}),'%')
+			</if>
+			<if test="dpid != null and dpid != ''.toString()">
+				 and z.dpid = #{dpid}
+			</if>
+		</where>
+	</sql>
+
+	
+	<!--     depart列表 -->
+	<select id="getDepartList" parameterType="map" resultType="map">
+        select DEPARTID,DEPARTNAME,DPID,ROLEID from (
+        select DEPARTID,DEPARTNAME,DPID,ROLEID, rownum rn from(
+        
+		select z.DEPARTID,z.DEPARTNAME,z.DPID,z.ROLEID from PT_DEPART z  
+		<include refid="getDepartList_where"></include>
+		)
+		) where rn  between #{result.start} and #{result.end}
+	
+	</select>
+	
+	<select id="getAllDept"  resultType="Depart">
+        select DEPARTID,DEPARTNAME,DPID,ROLEID from PT_DEPART
+	</select>
+	
+	<!--总数 -->
+	<select id="getDepartListCount" parameterType="map" resultType="long">
+		select count(*)
+		from PT_DEPART z 
+		<include refid="getDepartList_where"></include>
+	</select>
+	
+	
+	<select id="getDeptInfoById" parameterType="Integer" resultType="map">
+	     SELECT DEPARTID,DEPARTNAME,DPID,ROLEID FROM PT_DEPART  where DEPARTID=#{DEPARTID}
+	</select>
+	
+	<select id="getDpidInDeptId" parameterType="Integer" resultType="map">
+	     SELECT DEPARTID,DEPARTNAME,DPID,ROLEID FROM PT_DEPART  where dpid = #{departId}
+	    <!--  <foreach collection="array" item="list" open="(" separator="," close=")">
+			#{list}
+		</foreach> -->
+	</select>
+	
+	
+	<select id="getPidsById" parameterType="Integer" resultType="map">
+	     SELECT DEPARTID,DEPARTNAME,DPID,ROLEID FROM PT_DEPART  where dpid = #{departId} or  departId = #{departId}
+	</select>
+	
+	<delete id="deteleDept"  parameterType="int">
+		DELETE FROM PT_DEPART Z WHERE Z.DEPARTID = #{departId}
+		<!-- <foreach collection="array" item="list" open="(" separator="," close=")">
+		#{list}
+		</foreach> -->
+	</delete>
+	
+	
+	<update id="updateDept" parameterType="map">
+		UPDATE  
+			PT_DEPART 
+		SET 
+			DEPARTNAME =#{departName},
+			ROLEID =#{roleId}
+		WHERE DEPARTID =#{departId} 
+	</update>
+	
+	
+	<insert id="addDept" parameterType="map">
+		insert into PT_depart(departid,departname,dpid,roleid) 
+		values(Seq_Depart.Nextval,#{departName}, #{departId},#{roleId}) 
+	</insert>
+	
+	<select id="getRoleList"   resultType="Role">
+	     SELECT ROLEID,ROLENAME FROM PT_ROLE 
+	</select>
+	
+</mapper>

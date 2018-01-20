@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.WYBXDao">
+	<sql id="getWhere">
+			<if test="beginTime != null and beginTime !=''.toString()">
+			AND t.MAINTAINDATE &gt;= to_date(#{beginTime},'yyyy-mm-dd')
+			</if>
+			
+			
+			<if test="endTime != null and endTime !=''.toString()">
+			AND t.MAINTAINDATE &lt;= to_date(#{endTime},'yyyy-mm-dd HH24:mi:ss ')
+			</if>
+			
+			<if test="departId != null and departId !=''.toString()">
+			AND t.departId = #{departId}
+			</if>
+	</sql>
+	
+	<select id="getBXTongJi" parameterType="map" resultType="Property">
+	select count(e.NAME) total,t.departid,d.departname,e.NAME name from pt_wybx t
+	left join pt_depart d 
+	on t.departid = d.departid
+	left join PT_USER e on (t.USERID=e.USERID)
+	 where d.dpid='37' and t.STATUES=4
+	  <include refid="getWhere"></include>
+		group by t.departid,d.departname,e.NAME
+	</select>
+	
+	<select id="getBXTongJiTotal" parameterType="map" resultType="long">
+	select count(1) total from pt_wybx t
+	left join pt_depart d 
+	on t.departid = d.departid 
+	where d.dpid='37' and t.STATUES=4
+	 <include refid="getWhere"></include>
+	</select>
+	
+</mapper>

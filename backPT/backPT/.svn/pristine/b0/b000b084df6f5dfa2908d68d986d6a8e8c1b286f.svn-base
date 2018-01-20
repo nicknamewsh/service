@@ -1,0 +1,51 @@
+package com.pt.ssm.service.impl;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.pt.ssm.dao.ScrapDao;
+import com.pt.ssm.po.Property;
+import com.pt.ssm.service.ScrapService;
+import com.pt.ssm.util.ModelResults;
+
+@Service
+@Transactional
+public class ScrapServiceImpl implements ScrapService{
+
+	@Autowired
+	private ScrapDao scrapDao;
+	private List<Property> propertyList = new ArrayList<Property>();
+	
+	
+	@Override
+	public ModelResults getScrapList(String id, String applyname, long start, long end) throws UnsupportedEncodingException {
+		ModelResults result = new ModelResults(start, end);
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("id", URLDecoder.decode(id, "UTF-8"));
+		paramMap.put("applyname", URLDecoder.decode(applyname, "UTF-8"));
+		paramMap.put("result", result);
+		
+		List<Map<String, Object>> propertytList = null;
+		long count = 0;
+		try {
+			propertytList = scrapDao.getScrapList(paramMap);
+			count = scrapDao.getScrapListCount(paramMap);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return result;
+		}
+		result.setRows(propertytList);
+		result.setTotal(count);
+		return result;
+	}
+
+}
+

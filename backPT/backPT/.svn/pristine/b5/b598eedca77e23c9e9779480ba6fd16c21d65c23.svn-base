@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.MaterialDao">
+
+	<sql id="getMaterialListWhere">
+		<where>
+			<if test="materialName != null and materialName !=''.toString()">
+			AND Z.materialName LIKE CONCAT('%',CONCAT(#{materialName},'%'))
+			</if>
+			
+			
+			<if test="personName != null and personName !=''.toString()">
+			AND Z.personName LIKE CONCAT('%',CONCAT(#{personName},'%'))
+			</if>
+		</where>
+	</sql>
+	<select id="getMaterialList" parameterType="map" resultType="map">
+	 SELECT id,materialName,materialMoney,personName,materialDate FROM(
+  SELECT z.id,z.materialName,z.materialMoney,z.personName,to_Char(z.materialDate,'yyyy-mm-dd') materialDate ,rownum RN from pt_material z
+     <include refid="getMaterialListWhere"></include>
+     order by materialDate desc
+  ) WHERE RN BETWEEN #{page} AND #{pageSize}
+	</select>
+	
+	<select id="getMaterialListCount" parameterType="map" resultType="long">
+	SELECT COUNT(1) FROM pt_material Z
+	<include refid="getMaterialListWhere"></include>
+	</select>	
+	
+	
+	
+	
+	<select id="getMaterialInfoById" parameterType="map" resultType="material">
+		  SELECT z.id,z.materialName,z.materialMoney,z.personName,to_Char(z.materialDate,'yyyy-mm-dd') materialDate from pt_material z
+   		 where Z.id = #{id}
+	</select>
+	
+	
+	<insert id="addMaterialInfo" parameterType="material">
+		insert into pt_material(id,materialName,materialMoney,personName,materialDate)
+		values(
+		seq_Material.nextval,#{materialName,jdbcType=VARCHAR},#{materialMoney,jdbcType=NUMERIC},
+       						 #{personName,jdbcType=VARCHAR},to_Date(#{materialDate,jdbcType=VARCHAR},'yyyy-mm-dd'))
+	</insert>
+	
+	
+	<update id="updateMaterialInfo" parameterType="material">
+		update pt_material 
+		set materialName = #{materialName,jdbcType=VARCHAR},materialMoney = #{materialMoney,jdbcType=NUMERIC},
+		    personName = #{personName,jdbcType=VARCHAR},materialDate = to_Date(#{materialDate,jdbcType=VARCHAR},'yyyy-mm-dd')
+		where id = #{id}
+	</update>
+	
+	
+	<delete id="delMaterialInfoByIds" parameterType="int">
+		DELETE FROM pt_material WHERE id in 
+		<foreach collection="array" item="list" open="(" separator="," close=")">
+		#{list}
+		</foreach>
+	</delete>
+</mapper>

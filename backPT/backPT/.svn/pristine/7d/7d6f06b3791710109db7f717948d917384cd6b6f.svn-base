@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.RentDao">
+
+	<sql id="getRentListWhere">
+		<if test="rentName != null and rentName !=''.toString()">
+		AND Z.rentName LIKE CONCAT('%',CONCAT(#{rentName},'%'))
+		</if>
+	</sql>
+	
+	
+	
+   <sql id="getWhere">
+		<if test="rentName != null and rentName !=''.toString()">
+		AND b.UNIT LIKE CONCAT('%',CONCAT(#{rentName},'%'))
+		</if>
+		
+		<if test="isCome != null and isCome !=''.toString()">
+		AND b.UNIT LIKE CONCAT('%',CONCAT(#{rentName},'%'))
+		</if>
+		
+		and a.ispay=#{type}
+	</sql>
+	
+	
+	 <sql id="getWhereByIsCome">
+	 	<where>
+		<if test="isCome != null and isCome !=''.toString()">
+		AND isCome &lt;= #{isCome}
+		</if>
+		</where>
+	</sql>
+	
+	
+	<select id="getRentList" parameterType="map" resultType="map">
+	select id ,PT_CUSTOMERDATAID,(case when isCome = 0 then '已到期' else to_char(isCome) end) isCome,STARTTIME,ENDTIME,FANZHU,UNIT,CONTRACTNO,(case when ISPAY ='0' then '未收取' when ISPAY ='1' then '已收取' else '' end) ISPAY from(
+	 select id,PT_CUSTOMERDATAID,isCome,STARTTIME,ENDTIME,FANZHU,UNIT,CONTRACTNO,ISPAY,RN from (
+	select id,PT_CUSTOMERDATAID,ceil((To_date(ENDTIME , 'yyyy-mm-dd') - To_date(nowTime, 'yyyy-mm-dd'))) isCome,STARTTIME,ENDTIME,FANZHU,UNIT,CONTRACTNO,ISPAY,RN from (
+	select a.id,a.PT_CUSTOMERDATAID,to_char(sysdate,'yyyy-mm-dd') nowTime,to_Char(a.STARTTIME,'yyyy-mm-dd') STARTTIME ,to_Char(a.ENDTIME,'yyyy-mm-dd') ENDTIME ,a.FANZHU,b.UNIT,b.CONTRACTNO,a.ISPAY,rownum RN from  PT_CUSTOMERDATA_RIGHT a 
+	left join PT_CUSTOMERDATA b on a.PT_CUSTOMERDATAID=b.ID where a.isdal=0
+	<include refid="getWhere"></include>
+	)) <include refid="getWhereByIsCome"></include>  order by isCome
+	) WHERE RN BETWEEN #{result.start} AND #{result.end}
+	
+	</select>
+	
+
+	
+	<select id="getrightInfoById" parameterType="map" resultType="map">
+    
+    select z.id,z.CUSTOMERNAME,z.UNIT,z.MOBILEPHONE,z.ENTERPRISEXZ,z.CONTRACTNO,to_Char(z.KAISHI,'yyyy-mm-dd') KAISHI,to_Char(z.JIESHU,'yyyy-mm-dd') JIESHU,to_Char(z.RENTTIME,'yyyy-mm-dd')RENTTIME,z.HUXING,z.LOUDONG,z.LOUHAO,z.RENTTYPE,
+   z.RENT,z.PROPERTY,z.WYJE,z.AREA,z.tc,z.hys,z.nbbj,z.zwzl,a.sfje,z.dk,z.cyfw,z.wxfw,to_Char(a.STARTTIME,'yyyy-mm-dd') STARTTIME,to_Char(a.ENDTIME,'yyyy-mm-dd') ENDTIME,a.FANZHU,a.ispay,a.beizhu from PT_CUSTOMERDATA_RIGHT a 
+    left join PT_CUSTOMERDATA z on a.PT_CUSTOMERDATAID=z.ID where a.isdal=0 and a.id = #{id}
+
+	</select>
+
+
+	<select id="getRentList1" parameterType="map" resultType="map">
+	 select id,roomNumber,htong,rentName,area,beginTime,endTime,(case when isCome &lt;= 0  then '已到期'  when (isCome &gt; 0 and isCome &lt;=30) then '近期到期' else '' end) isCome,rentmoney,statues from
+ (SELECT id,roomNumber,htong,rentName,area,beginTime,endTime,ceil((To_date(endTime , 'yyyy-mm-dd') - To_date(nowTime, 'yyyy-mm-dd'))) isCome ,rentmoney,statues,RN FROM(
+  SELECT z.id,z.roomNumber,htong,z.rentName,z.area,to_char(sysdate,'yyyy-mm-dd') nowTime,to_Char(z.beginTime,'yyyy-mm-dd') beginTime ,to_Char(z.endTime,'yyyy-mm-dd') endTime,z.rentmoney,(case when z.statues = 0 then '正常状态' else '历史记录' end) statues,rownum RN from pt_rent z
+  where z.statues = 1
+  	<include refid="getRentListWhere"></include>
+  ) order by isCome
+  ) WHERE RN BETWEEN #{page} AND #{pageSize}
+	</select>
+	
+	
+	<select id="getAllRentList" parameterType="map" resultType="map">
+	 select id,roomNumber,htong,rentName,area,beginTime,endTime,(case when isCome &lt;= 0  then '已到期'  when (isCome &gt; 0 and isCome &lt;=30) then '近期到期' else '' end) isCome,rentmoney,statues from
+ (SELECT id,roomNumber,htong,rentName,area,beginTime,endTime,ceil((To_date(endTime , 'yyyy-mm-dd') - To_date(nowTime, 'yyyy-mm-dd'))) isCome ,rentmoney,statues,RN FROM(
+  SELECT z.id,z.roomNumber,z.htong,z.rentName,z.area,to_char(sysdate,'yyyy-mm-dd') nowTime,to_Char(z.beginTime,'yyyy-mm-dd') beginTime ,to_Char(z.endTime,'yyyy-mm-dd') endTime,z.rentmoney,(case when z.statues = 0 then '正常状态' else '历史记录' end) statues,rownum RN from pt_rent z
+  where 1 = 1
+  	<include refid="getRentListWhere"></include>
+  ) order by isCome
+  ) WHERE RN BETWEEN #{page} AND #{pageSize}
+	</select>
+	
+	
+	
+	<select id="getRentListCount" parameterType="map" resultType="long">
+	select COUNT(1) from  PT_CUSTOMERDATA_RIGHT a 
+    left join PT_CUSTOMERDATA b on a.PT_CUSTOMERDATAID=b.ID where a.isdal=0
+	<include refid="getWhere"></include>
+	</select>
+	
+	<select id="getRentListCount1" parameterType="map" resultType="long">
+	SELECT COUNT(1) FROM pt_rent Z where z.statues = 1
+	<include refid="getRentListWhere"></include>
+	</select>	
+	
+	
+	<select id="getAllRentListCount" parameterType="map" resultType="long">
+	SELECT COUNT(1) FROM pt_rent Z where 1 = 1
+	<include refid="getRentListWhere"></include>
+	</select>	
+	
+	
+	
+	
+	
+	<select id="getRentInfoById" parameterType="map" resultType="rent">
+		 SELECT z.id,z.roomNumber,z.htong,z.rentName,z.area,to_Char(z.beginTime,'yyyy-mm-dd') beginTime ,to_Char(z.endTime,'yyyy-mm-dd') endTime,z.rentmoney,z.htong,
+		 z.wyf,z.sdf,z.tcf,z.zzf,z.total from pt_rent z
+   		 where Z.id = #{id}
+	</select>
+	
+	
+	<insert id="addRentInfo" parameterType="rent">
+		insert into pt_rent(id,roomNumber,rentName,area,beginTime,endTime,rentMoney,statues,htong,wyf,sdf,tcf,zzf,total)
+		values(
+		seq_rent.nextval,#{roomNumber,jdbcType=VARCHAR},#{rentName,jdbcType=VARCHAR},
+       						 #{area,jdbcType=NUMERIC},to_Date(#{beginTime,jdbcType=VARCHAR},'yyyy-mm-dd'),
+       						 to_Date(#{endTime,jdbcType=VARCHAR},'yyyy-mm-dd'), #{rentMoney,jdbcType=NUMERIC},0,#{htong,jdbcType=VARCHAR},
+       						 #{wyf,jdbcType=VARCHAR},#{sdf,jdbcType=VARCHAR},#{tcf,jdbcType=VARCHAR},#{zzf,jdbcType=VARCHAR},
+       						 #{total,jdbcType=VARCHAR}
+       						 )
+	</insert>
+	
+	
+	<update id="updateRentInfo" parameterType="rent">
+		update pt_rent 
+		set roomNumber = #{roomNumber,jdbcType=VARCHAR},rentName = #{rentName,jdbcType=VARCHAR},
+		    area = #{area,jdbcType=NUMERIC},beginTime = to_Date(#{beginTime,jdbcType=VARCHAR},'yyyy-mm-dd'),
+		    endTime = to_Date(#{endTime,jdbcType=VARCHAR},'yyyy-mm-dd'),rentMoney = #{rentMoney,jdbcType=NUMERIC},htong=#{htong,jdbcType=VARCHAR},
+		   wyf =  #{wyf,jdbcType=VARCHAR},sdf = #{sdf,jdbcType=VARCHAR},tcf = #{tcf,jdbcType=VARCHAR},zzf = #{zzf,jdbcType=VARCHAR},
+       	   total = #{total,jdbcType=VARCHAR}
+		where id = #{id}
+	</update>
+	
+	
+	<delete id="delRentInfoByIds" parameterType="int">
+		update PT_CUSTOMERDATA_RIGHT set ISDAL=1 WHERE id in 
+		<foreach collection="array" item="list" open="(" separator="," close=")">
+		#{list}
+		</foreach>
+	</delete>
+	
+	<update id="updateStatueById" parameterType="map">
+		update PT_CUSTOMERDATA_RIGHT 
+		set ispay = #{ispay},beizhu=#{beizhu},sfje=#{sfje}
+		where id = #{id}
+	</update>
+</mapper>

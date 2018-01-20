@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.MenuDao">
+	<!-- 查询菜单 -->
+	<select id="getMenuList" parameterType="String" resultType="menu">
+		select t.menuid,t.menuname,t.pid,t.orderid,t.url,t.menustyle,t.isleaf from PT_MENU t
+		left join PT_role_menu rm on rm.menuid = t.menuid
+		where t.isbutton = 0 and rm.roleid = #{roleId} order by orderid asc
+	</select>
+	
+	
+	<select id="getButtonList" parameterType="String" resultType="menu">
+		select t.menuid,t.menuname,t.pid,t.orderid,t.url,t.menustyle,t.isleaf from PT_MENU t
+		left join PT_role_menu rm on rm.menuid = t.menuid
+		where t.isbutton = 1 and rm.roleid = #{roleId}
+	</select>
+</mapper>

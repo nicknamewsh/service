@@ -1,0 +1,9 @@
+package com.pt.ssm.service;
+
+import com.pt.ssm.util.ModelBean;
+
+public interface LoginService {
+
+     ModelBean login(String name, String password);
+
+}

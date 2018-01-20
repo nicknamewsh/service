@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.CustomerDao">
+
+	<sql id="getCustomerListWhere">
+		<where>
+			<if test="customerName != null and customerName !=''.toString()">
+			AND Z.customerName LIKE CONCAT('%',CONCAT(#{customerName},'%'))
+			</if>
+			
+			<if test="danWei != null and danWei !=''.toString()">
+			AND Z.danWei LIKE CONCAT('%',CONCAT(#{danWei},'%'))
+			</if>
+			
+			<if test="post != null and post !=''.toString()">
+			AND Z.post LIKE CONCAT('%',CONCAT(#{post},'%'))
+			</if>
+		</where>
+	</sql>
+	<select id="getCustomerList" parameterType="map" resultType="map">
+	  SELECT id,customername,sex,danwei,post, email,wangzhan,mobilephone,telephone,companyphone,fax,qqhao FROM(
+  SELECT z.id,z.customername,(case when z.customergender = 0 then '男' else '女' end) sex,z.danwei,z.post,
+  z.email,z.wangzhan,z.mobilephone,z.telephone,z.companyphone,z.fax,z.qqhao ,rownum RN from pt_customerdata z
+     <include refid="getCustomerListWhere"></include>
+  ) WHERE RN BETWEEN #{page} AND #{pageSize}
+	</select>
+	
+	<select id="getCustomerListCount" parameterType="map" resultType="long">
+	SELECT COUNT(1) FROM pt_customerdata Z
+	<include refid="getCustomerListWhere"></include>
+	</select>	
+	
+	
+	
+	
+	<select id="getCustomerInfoById" parameterType="map" resultType="customerData">
+		 SELECT z.id,z.customername,(case when z.customergender = 0 then '男' else '女' end) sex,z.danwei,z.post,
+  z.email,z.wangzhan,z.mobilephone,z.telephone,z.companyphone,z.fax,z.qqhao from pt_customerdata z
+   		 where Z.id = #{id}
+	</select>
+	
+	
+	<insert id="addCustomerInfo" parameterType="customerData">
+		insert into pt_customerdata(id,customername,customerGender,danwei,post,email,wangzhan,mobilephone,telephone,companyphone,fax,qqhao)
+		values(
+		seq_customerdata.nextval,#{customerName,jdbcType=VARCHAR},#{customerGender,jdbcType=NUMERIC},
+       						 #{danWei,jdbcType=VARCHAR}, #{post,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},
+       						 #{wangzhan,jdbcType=VARCHAR}, #{mobilePhone,jdbcType=VARCHAR}, #{telePhone,jdbcType=VARCHAR},
+       						 #{companyPhone,jdbcType=VARCHAR},#{fax,jdbcType=VARCHAR},#{QQHao,jdbcType=VARCHAR}
+       						 )
+	</insert>
+	
+	
+	<update id="updateCustomerInfo" parameterType="customerData">
+		update pt_customerdata 
+		set customerName = #{customerName,jdbcType=VARCHAR},customerGender = #{customerGender,jdbcType=NUMERIC},
+		    danWei = #{danWei,jdbcType=VARCHAR}, post = #{post,jdbcType=VARCHAR}, email = #{email,jdbcType=VARCHAR},
+		    wangzhan = #{wangzhan,jdbcType=VARCHAR}, mobilePhone = #{mobilePhone,jdbcType=VARCHAR}, telePhone = #{telePhone,jdbcType=VARCHAR},
+		    companyPhone = #{companyPhone,jdbcType=VARCHAR}, fax = #{fax,jdbcType=VARCHAR}, QQHao = #{QQHao,jdbcType=VARCHAR}
+		where id = #{id}
+	</update>
+	
+	
+	<delete id="delCustomerInfoByIds" parameterType="int">
+		DELETE FROM pt_customerdata WHERE id in 
+		<foreach collection="array" item="list" open="(" separator="," close=")">
+		#{list}
+		</foreach>
+	</delete>
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.RentDao">
+
+	<sql id="getRentListWhere">
+		<if test="rentName != null and rentName !=''.toString()">
+		AND Z.rentName LIKE CONCAT('%',CONCAT(#{rentName},'%'))
+		</if>
+	</sql>
+	<select id="getRentList" parameterType="map" resultType="map">
+	 select id,roomNumber,rentName,area,beginTime,endTime,(case when isCome &lt;= 0  then '已到期'  when (isCome &gt; 0 and isCome &lt;=30) then '近期到期' else '' end) isCome,rentmoney,statues from
+ (SELECT id,roomNumber,rentName,area,beginTime,endTime,ceil((To_date(endTime , 'yyyy-mm-dd') - To_date(nowTime, 'yyyy-mm-dd'))) isCome ,rentmoney,statues,RN FROM(
+  SELECT z.id,z.roomNumber,z.rentName,z.area,to_char(sysdate,'yyyy-mm-dd') nowTime,to_Char(z.beginTime,'yyyy-mm-dd') beginTime ,to_Char(z.endTime,'yyyy-mm-dd') endTime,z.rentmoney,(case when z.statues = 0 then '正常状态' else '历史记录' end) statues,rownum RN from pt_rent z
+  where z.statues = 0
+  	<include refid="getRentListWhere"></include>
+  ) order by isCome
+  ) WHERE RN BETWEEN #{page} AND #{pageSize}
+	</select>
+	
+	
+	
+	<select id="getRentList1" parameterType="map" resultType="map">
+	 select id,roomNumber,rentName,area,beginTime,endTime,(case when isCome &lt;= 0  then '已到期'  when (isCome &gt; 0 and isCome &lt;=30) then '近期到期' else '' end) isCome,rentmoney,statues from
+ (SELECT id,roomNumber,rentName,area,beginTime,endTime,ceil((To_date(endTime , 'yyyy-mm-dd') - To_date(nowTime, 'yyyy-mm-dd'))) isCome ,rentmoney,statues,RN FROM(
+  SELECT z.id,z.roomNumber,z.rentName,z.area,to_char(sysdate,'yyyy-mm-dd') nowTime,to_Char(z.beginTime,'yyyy-mm-dd') beginTime ,to_Char(z.endTime,'yyyy-mm-dd') endTime,z.rentmoney,(case when z.statues = 0 then '正常状态' else '历史记录' end) statues,rownum RN from pt_rent z
+  where z.statues = 1
+  	<include refid="getRentListWhere"></include>
+  ) order by isCome
+  ) WHERE RN BETWEEN #{page} AND #{pageSize}
+	</select>
+	
+	
+	
+	<select id="getRentListCount" parameterType="map" resultType="long">
+	SELECT COUNT(1) FROM pt_rent Z where z.statues = 0
+	<include refid="getRentListWhere"></include>
+	</select>
+	
+	
+	<select id="getRentListCount1" parameterType="map" resultType="long">
+	SELECT COUNT(1) FROM pt_rent Z where z.statues = 1
+	<include refid="getRentListWhere"></include>
+	</select>	
+	
+	
+	
+	
+	<select id="getRentInfoById" parameterType="map" resultType="rent">
+		 SELECT z.id,z.roomNumber,z.rentName,z.area,to_Char(z.beginTime,'yyyy-mm-dd') beginTime ,to_Char(z.endTime,'yyyy-mm-dd') endTime,z.rentmoney from pt_rent z
+   		 where Z.id = #{id}
+	</select>
+	
+	
+	<insert id="addRentInfo" parameterType="rent">
+		insert into pt_rent(id,roomNumber,rentName,area,beginTime,endTime,rentMoney,statues)
+		values(
+		seq_rent.nextval,#{roomNumber,jdbcType=VARCHAR},#{rentName,jdbcType=VARCHAR},
+       						 #{area,jdbcType=NUMERIC},to_Date(#{beginTime,jdbcType=VARCHAR},'yyyy-mm-dd'),
+       						 to_Date(#{endTime,jdbcType=VARCHAR},'yyyy-mm-dd'), #{rentMoney,jdbcType=NUMERIC},0
+       						 )
+	</insert>
+	
+	
+	<update id="updateRentInfo" parameterType="rent">
+		update pt_rent 
+		set roomNumber = #{roomNumber,jdbcType=VARCHAR},rentName = #{rentName,jdbcType=VARCHAR},
+		    area = #{area,jdbcType=NUMERIC},beginTime = to_Date(#{beginTime,jdbcType=VARCHAR},'yyyy-mm-dd'),
+		    endTime = to_Date(#{endTime,jdbcType=VARCHAR},'yyyy-mm-dd'),rentMoney = #{rentMoney,jdbcType=NUMERIC}
+		where id = #{id}
+	</update>
+	
+	
+	<delete id="delRentInfoByIds" parameterType="int">
+		DELETE FROM pt_rent WHERE id in 
+		<foreach collection="array" item="list" open="(" separator="," close=")">
+		#{list}
+		</foreach>
+	</delete>
+	
+	<update id="updateStatueById" parameterType="int">
+		update pt_rent 
+		set statues = 1
+		where id = #{id}
+	</update>
+</mapper>

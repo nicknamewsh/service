@@ -1,0 +1,11 @@
+package com.pt.ssm.dao;
+
+import java.util.List;
+import java.util.Map;
+
+public interface AssignDao {
+
+	
+	List<Map<String, Object>> getAssignList(Map<String, Object> paramMap) throws Exception;
+	long getAssignListCount(Map<String, Object> paramMap) throws Exception;
+}

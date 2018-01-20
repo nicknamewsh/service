@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.AuthorityDao">
+	<sql id="getAuthorityList">
+		<where>
+			<if test="departname!= null and departname !=''.toString()">
+			AND Z.DEPARTNAME LIKE CONCAT('%',CONCAT(#{departname},'%'))
+			</if>
+		</where>
+	</sql>
+	<select id="getAuthorityList" parameterType="map" resultType="map">
+	SELECT DEPARTID,DEPARTNAME,DPID,DLEVEL,ORDERID,REMARK FROM(
+	SELECT DEPARTID,DEPARTNAME,DPID,DLEVEL,ORDERID,REMARK,ROWNUM RN FROM(
+	SELECT Z.DEPARTID,Z.DEPARTNAME,Z.DPID,Z.DLEVEL,Z.ORDERID,Z.REMARK FROM PT_DEPART Z
+	<include refid="getAuthorityList"></include>
+	ORDER BY Z.DEPARTID)
+	) WHERE RN BETWEEN #{page} AND #{pageSize}
+	</select>
+	
+	<select id="getAuthorityListCount" parameterType="map" resultType="long">
+	SELECT COUNT(1) FROM PT_DEPART
+	<include refid="getAuthorityList"></include>
+	</select>	
+	
+	<select id="getMenuList" parameterType="map" resultType="map">
+	select * from (
+	select m.menuid id,m.menuname name,m.pid pid,case when 1=1 then 'false' end checked,'true' open from PT_menu m where m.menuid not in (
+select m.menuid from  PT_menu m left join PT_role_menu rm on m.menuid = rm.menuid where rm.roleid=#{roleid} 
+)
+union all
+SELECT M.MENUID id,M.MENUNAME name,M.PID pId,(case when rm.menuid is not null then 'true' else 'false' end) checked,'true' open FROM PT_MENU M 
+left join PT_role_menu rm on m.menuid = rm.menuid where rm.roleid=#{roleid} 
+) order by id
+	</select>
+	
+	<insert id="addrm" parameterType="java.util.List">
+      INSERT INTO PT_ROLE_MENU
+  	  (ID, ROLEID, MENUID) 
+	<foreach collection="list" item="item" index="index" separator="union" open="(" close=")">
+	select 
+	       #{item.id,jdbcType=VARCHAR},
+           #{item.roleid,jdbcType=VARCHAR},
+           #{item.menuid,jdbcType=VARCHAR}
+           from dual
+   </foreach>
+  </insert>
+	
+  <select id="getRoleMenuList" parameterType="map" resultType="map">
+  SELECT id,roleid,menuid FROM PT_ROLE_MENU WHERE ROLEID = #{roleid}
+  </select>
+	
+	<delete id="delrm" parameterType="int">
+	DELETE FROM PT_role_menu M WHERE M.ROLEID in 
+	<foreach collection="array" item="list" open="(" separator="," close=")">
+	#{list}
+	</foreach>
+	</delete>
+	
+	<insert id="updaterm" parameterType="java.util.List">
+	INSERT INTO PT_ROLE_MENU
+  	  (ID, ROLEID, MENUID) 
+  	<foreach collection="list" item="item" index="index" separator="union" open="(" close=")">
+	select 
+	       #{item.id,jdbcType=VARCHAR},
+           #{item.roleid,jdbcType=VARCHAR},
+           #{item.menuid,jdbcType=VARCHAR}
+           from dual
+   </foreach>  
+	</insert>
+	
+	<select id="findMaxId" resultType="long">
+	SELECT MAX(ID) ID FROM PT_role_menu
+	</select>
+	
+	<delete id="delRmOneRole" parameterType="map">
+	DELETE FROM PT_ROLE_MENU ZM WHERE 
+	 ZM.ROLEID=#{roleid}
+	</delete>
+	
+	
+	
+	<select id="getRoleInfo" parameterType="map" resultType="map">
+	SELECT R.ROLEID,R.ROLENAME FROM PT_ROLE R WHERE R.ROLENAME LIKE CONCAT('%',CONCAT(#{rolename},'%'))
+	</select>
+</mapper>

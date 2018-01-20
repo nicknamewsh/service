@@ -1,0 +1,319 @@
+package com.pt.ssm.controller;
+
+
+
+import java.io.IOException;
+
+import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.pt.ssm.po.CustomerData;
+import com.pt.ssm.util.Util;
+import com.pt.ssm.service.CustomerService;
+import com.pt.ssm.util.ModelBean;
+import com.pt.ssm.util.ModelResults;
+
+
+@Controller
+@RequestMapping("/customer")
+public class CustomerController {
+	@Autowired
+	private CustomerService customerService;
+	
+
+	@RequestMapping(value="/getCustomerList")
+	@ResponseBody
+	public ModelResults getCustomerList(
+			@RequestParam(value ="customerName",required = false)String customerName,
+			@RequestParam(value ="danWei",required = false)String danWei,
+			@RequestParam(value ="post",required = false)String post,
+			@RequestParam(value ="start",required = false,defaultValue="0")long page,
+			@RequestParam(value ="end",required = false,defaultValue="20")long size
+			) throws JSONException, IOException{
+		
+		ModelResults model = customerService.getCustomerList(page,size,customerName,danWei,post);
+		return model;
+	}
+	
+	@RequestMapping(value="/getCustomerList1")
+	@ResponseBody
+	public ModelResults getCustomerList1(
+			@RequestParam(value ="huXing",required = false)String huXing,
+			@RequestParam(value ="louYu",required = false)String louYu,
+			@RequestParam(value ="beginTime",required = false)String beginTime,
+			@RequestParam(value ="endTime",required = false)String endTime,
+			@RequestParam(value ="start",required = false,defaultValue="0")long page,
+			@RequestParam(value ="end",required = false,defaultValue="20")long size
+			) throws JSONException, IOException{
+		
+		ModelResults model = customerService.getCustomerList1(page,size,huXing,louYu,beginTime,endTime);
+		return model;
+	}
+	
+	
+	@RequestMapping(value="/addCustomerInfo")
+	@ResponseBody
+	public ModelBean addCustomerInfo(
+			@RequestParam(value ="customerName",required = false)String customerName,
+			@RequestParam(value ="customerGender",required = false)Integer customerGender,
+			@RequestParam(value ="danWei",required = false)String danWei,
+			@RequestParam(value ="post",required = false)String post,
+			@RequestParam(value ="email",required = false)String email,
+			@RequestParam(value ="wangzhan",required = false)String wangzhan,
+			@RequestParam(value ="mobilePhone",required = false)String mobilePhone,
+			@RequestParam(value ="telePhone",required = false)String telePhone,
+			@RequestParam(value ="companyPhone",required = false)String companyPhone,
+			@RequestParam(value ="fax",required = false)String fax,
+			@RequestParam(value ="QQHao",required = false)String QQHao
+			) throws JSONException, IOException{
+		
+		CustomerData cus = new CustomerData();
+		if(Util.isNull(customerGender)){
+			customerGender = 0;
+		}
+		cus.setCompanyPhone(companyPhone);
+		cus.setCustomerGender(customerGender);
+		cus.setDanWei(danWei);
+		cus.setEmail(email);
+		cus.setFax(fax);
+		cus.setMobilePhone(mobilePhone);
+		cus.setPost(post);
+		cus.setQQHao(QQHao);
+		cus.setTelePhone(telePhone);
+		cus.setCustomerName(customerName);
+		cus.setWangzhan(wangzhan);
+		ModelBean model = customerService.addCustomerInfo(cus);
+		return model;
+	}
+	
+	
+	@RequestMapping(value="/addCustomerInfo1")
+	@ResponseBody
+	public ModelBean addCustomerInfo1(
+			@RequestParam(value ="customerName",required = false)String customerName,
+			@RequestParam(value ="registerAdress",required = false)String registerAdress,
+			@RequestParam(value ="registerNunber",required = false)String registerNunber,
+			@RequestParam(value ="registerMoney",required = false)Double registerMoney,
+			@RequestParam(value ="frzm",required = false)String frzm,
+			@RequestParam(value ="nsrzm",required = false)String nsrzm,
+			@RequestParam(value ="enterpriseNumber",required = false)Integer enterpriseNumber,
+			@RequestParam(value ="enterpriseXZ",required = false)Integer enterpriseXZ,
+			@RequestParam(value ="enterpriseSS",required = false)Double enterpriseSS,
+			@RequestParam(value ="kaiShi",required = false)String kaiShi,
+			@RequestParam(value ="jieShu",required = false)String jieShu,
+			@RequestParam(value ="huXing",required = false)String huXing,
+			@RequestParam(value ="louYu",required = false)String louYu,
+			@RequestParam(value ="tc",required = false)Integer tc,
+			@RequestParam(value ="hys",required = false)Integer hys,
+			@RequestParam(value ="nbbj",required = false)Integer nbbj,
+			@RequestParam(value ="zwzl",required = false)Integer zwzl,
+			@RequestParam(value ="dk",required = false)Integer dk,
+			@RequestParam(value ="cyfw",required = false)Integer cyfw,
+			@RequestParam(value ="wxfw",required = false)Integer wxfw
+			) throws JSONException, IOException{
+		
+		CustomerData cus = new CustomerData();
+		if(Util.isNull(registerMoney)){
+			registerMoney = 0.0;
+		}
+		if(Util.isNull(enterpriseNumber)){
+			enterpriseNumber = 0;
+		}
+		
+		if(Util.isNull(enterpriseSS)){
+			enterpriseSS = 0.0;
+		}
+		
+		if(Util.isNull(tc)){
+			tc = 0;
+		}
+		if(Util.isNull(hys)){
+			hys = 0;
+		}
+		if(Util.isNull(nbbj)){
+			nbbj = 0;
+		}
+		if(Util.isNull(zwzl)){
+			zwzl = 0;
+		}
+		if(Util.isNull(dk)){
+			dk = 0;
+		}
+		if(Util.isNull(cyfw)){
+			cyfw = 0;
+		}
+		if(Util.isNull(wxfw)){
+			wxfw = 0;
+		}
+		cus.setCustomerName(customerName);
+		cus.setRegisterAdress(registerAdress);
+		cus.setRegisterMoney(registerMoney);
+		cus.setRegisterNunber(registerNunber);
+		cus.setCyfw(cyfw);
+		cus.setDk(dk);
+		cus.setEnterpriseNumber(enterpriseNumber);
+		cus.setEnterpriseSS(enterpriseSS);
+		cus.setEnterpriseXZ(enterpriseXZ);
+		cus.setFrzm(frzm);
+		cus.setHuXing(huXing);
+		cus.setHys(hys);
+		cus.setJieShu(jieShu);
+		cus.setKaiShi(kaiShi);
+		cus.setLouYu(louYu);
+		cus.setNbbj(nbbj);
+		cus.setNsrzm(nsrzm);
+		cus.setTc(tc);
+		cus.setWxfw(wxfw);
+		cus.setZwzl(zwzl);
+		ModelBean model = customerService.addCustomerInfo1(cus);
+		return model;
+	}
+	
+	
+	@RequestMapping(value="/getCustomerInfoById")
+	@ResponseBody
+	public ModelBean getCustomerInfoById(
+			@RequestParam(value="id",required = true)Integer id
+			) throws JSONException, IOException{
+		ModelBean model = customerService.getCustomerInfoById(id);
+		return model;
+	}
+	
+	
+	@RequestMapping(value="/updateCustomerInfo")
+	@ResponseBody
+	public ModelBean updateCustomerInfo(
+			@RequestParam(value="id",required = true)Integer id,
+			@RequestParam(value ="customerName",required = false)String customerName,
+			@RequestParam(value ="customerGender",required = false)Integer customerGender,
+			@RequestParam(value ="danWei",required = false)String danWei,
+			@RequestParam(value ="post",required = false)String post,
+			@RequestParam(value ="email",required = false)String email,
+			@RequestParam(value ="wangzhan",required = false)String wangzhan,
+			@RequestParam(value ="mobilePhone",required = false)String mobilePhone,
+			@RequestParam(value ="telePhone",required = false)String telePhone,
+			@RequestParam(value ="companyPhone",required = false)String companyPhone,
+			@RequestParam(value ="fax",required = false)String fax,
+			@RequestParam(value ="QQHao",required = false)String QQHao
+			) throws JSONException, IOException{
+		CustomerData cus = new CustomerData();
+		if(Util.isNull(customerGender)){
+			customerGender = 0;
+		}
+		cus.setCompanyPhone(companyPhone);
+		cus.setCustomerGender(customerGender);
+		cus.setDanWei(danWei);
+		cus.setEmail(email);
+		cus.setFax(fax);
+		cus.setMobilePhone(mobilePhone);
+		cus.setPost(post);
+		cus.setQQHao(QQHao);
+		cus.setTelePhone(telePhone);
+		cus.setWangzhan(wangzhan);
+		cus.setCustomerName(customerName);
+		cus.setId(id);
+		ModelBean model = customerService.updateCustomerInfo(cus);
+		return model;
+	}
+	
+	
+	@RequestMapping(value="/updateCustomerInfo1")
+	@ResponseBody
+	public ModelBean updateCustomerInfo1(
+			@RequestParam(value="id",required = true)Integer id,
+			@RequestParam(value ="customerName",required = false)String customerName,
+			@RequestParam(value ="registerAdress",required = false)String registerAdress,
+			@RequestParam(value ="registerNunber",required = false)String registerNunber,
+			@RequestParam(value ="registerMoney",required = false)Double registerMoney,
+			@RequestParam(value ="frzm",required = false)String frzm,
+			@RequestParam(value ="nsrzm",required = false)String nsrzm,
+			@RequestParam(value ="enterpriseNumber",required = false)Integer enterpriseNumber,
+			@RequestParam(value ="enterpriseXZ",required = false)Integer enterpriseXZ,
+			@RequestParam(value ="enterpriseSS",required = false)Double enterpriseSS,
+			@RequestParam(value ="kaiShi",required = false)String kaiShi,
+			@RequestParam(value ="jieShu",required = false)String jieShu,
+			@RequestParam(value ="huXing",required = false)String huXing,
+			@RequestParam(value ="louYu",required = false)String louYu,
+			@RequestParam(value ="tc",required = false)Integer tc,
+			@RequestParam(value ="hys",required = false)Integer hys,
+			@RequestParam(value ="nbbj",required = false)Integer nbbj,
+			@RequestParam(value ="zwzl",required = false)Integer zwzl,
+			@RequestParam(value ="dk",required = false)Integer dk,
+			@RequestParam(value ="cyfw",required = false)Integer cyfw,
+			@RequestParam(value ="wxfw",required = false)Integer wxfw
+			) throws JSONException, IOException{
+		
+		CustomerData cus = new CustomerData();
+		if(Util.isNull(registerMoney)){
+			registerMoney = 0.0;
+		}
+		if(Util.isNull(enterpriseNumber)){
+			enterpriseNumber = 0;
+		}
+		
+		if(Util.isNull(enterpriseSS)){
+			enterpriseSS = 0.0;
+		}
+		
+		if(Util.isNull(tc)){
+			tc = 0;
+		}
+		if(Util.isNull(hys)){
+			hys = 0;
+		}
+		if(Util.isNull(nbbj)){
+			nbbj = 0;
+		}
+		if(Util.isNull(zwzl)){
+			zwzl = 0;
+		}
+		if(Util.isNull(dk)){
+			dk = 0;
+		}
+		if(Util.isNull(cyfw)){
+			cyfw = 0;
+		}
+		if(Util.isNull(wxfw)){
+			wxfw = 0;
+		}
+		cus.setCustomerName(customerName);
+		cus.setRegisterAdress(registerAdress);
+		cus.setRegisterMoney(registerMoney);
+		cus.setRegisterNunber(registerNunber);
+		cus.setCyfw(cyfw);
+		cus.setDk(dk);
+		cus.setEnterpriseNumber(enterpriseNumber);
+		cus.setEnterpriseSS(enterpriseSS);
+		cus.setEnterpriseXZ(enterpriseXZ);
+		cus.setFrzm(frzm);
+		cus.setHuXing(huXing);
+		cus.setHys(hys);
+		cus.setJieShu(jieShu);
+		cus.setKaiShi(kaiShi);
+		cus.setLouYu(louYu);
+		cus.setNbbj(nbbj);
+		cus.setNsrzm(nsrzm);
+		cus.setTc(tc);
+		cus.setWxfw(wxfw);
+		cus.setZwzl(zwzl);
+		cus.setId(id);
+		ModelBean model = customerService.updateCustomerInfo1(cus);
+		return model;
+	}
+	
+	
+	
+	/**
+	 * 批量删除
+	 * @param roleid[]
+	 * */
+	@RequestMapping(value = "delCustomerInfoByIds")
+	@ResponseBody
+	public ModelBean delCustomerInfoByIds(@RequestParam(value = "ids",required = true)long[] ids) throws Exception{
+		return customerService.delCustomerInfoByIds(ids);
+	}
+}

@@ -1,0 +1,60 @@
+package com.pt.ssm.po;
+
+public class Announcement {
+	private Integer id;
+	private String noticeperson;
+    private String noticeconent;
+    private String noticetime;
+    private Integer noticestatues;
+    private Integer statues;
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getNoticeperson() {
+		return noticeperson;
+	}
+	public void setNoticeperson(String noticeperson) {
+		this.noticeperson = noticeperson;
+	}
+	public String getNoticeconent() {
+		return noticeconent;
+	}
+	public void setNoticeconent(String noticeconent) {
+		this.noticeconent = noticeconent;
+	}
+	public String getNoticetime() {
+		return noticetime;
+	}
+	public void setNoticetime(String noticetime) {
+		this.noticetime = noticetime;
+	}
+	public Integer getNoticestatues() {
+		return noticestatues;
+	}
+	public void setNoticestatues(Integer noticestatues) {
+		this.noticestatues = noticestatues;
+	}
+	public Integer getStatues() {
+		return statues;
+	}
+	public void setStatues(Integer statues) {
+		this.statues = statues;
+	}
+	public Announcement(Integer id, String noticeperson, String noticeconent,
+			String noticetime, Integer noticestatues, Integer statues) {
+		super();
+		this.id = id;
+		this.noticeperson = noticeperson;
+		this.noticeconent = noticeconent;
+		this.noticetime = noticetime;
+		this.noticestatues = noticestatues;
+		this.statues = statues;
+	}
+	public Announcement() {
+		super();
+	}
+    
+}

@@ -1,0 +1,14 @@
+package com.pt.ssm.service;
+
+import java.io.UnsupportedEncodingException;
+
+import com.pt.ssm.util.ModelResults;
+
+public interface WarrantyService {
+
+	
+	//获取Property集合
+	ModelResults getWarrantyList(String id, String applyname, long page, long pageSize) throws UnsupportedEncodingException;
+	
+	
+}

@@ -1,0 +1,38 @@
+package com.pt.ssm.dao;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import com.pt.ssm.po.CustomerData;
+import com.pt.ssm.po.CustomerRight;
+
+public interface CustomerDao {
+
+	List<Map<String, Object>> getCustomerList(Map<String, Object> paramMap);
+	
+	List<Map<String, Object>> getExportExcel(Map<String, Object> paramMap);
+
+	long getCustomerListCount(Map<String, Object> paramMap);
+
+	Integer addCustomerInfo(CustomerData cus);
+
+	CustomerData getCustomerInfoById(Map<String, Object> paramMap);
+
+	Integer updateCustomerInfo(CustomerData cus);
+
+	Integer delCustomerInfoByIds(long[] ids);
+
+	List<Map<String, Object>> getCustomerList1(Map<String, Object> paramMap);
+
+	Integer addCustomer(Map<String, Object> paramMap);
+
+	Integer updateCustomerInfo1(Map<String, Object> paramMap);
+
+	ArrayList<CustomerData> getCustomerInfoByLouHao(Map<String, Object> paramMap);
+
+	Integer addCustomerRight(CustomerRight right);
+
+	ArrayList<CustomerData> getCustomerRightById(Map<String, Object> paramMap);
+
+}

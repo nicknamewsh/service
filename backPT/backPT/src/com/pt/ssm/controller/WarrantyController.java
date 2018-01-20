@@ -1,0 +1,184 @@
+package com.pt.ssm.controller;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.pt.ssm.constant.MsgConstant;
+import com.pt.ssm.po.Property;
+import com.pt.ssm.po.User;
+import com.pt.ssm.service.WarrantyService;
+import com.pt.ssm.util.HttpRequest;
+import com.pt.ssm.util.ModelBean;
+import com.pt.ssm.util.ModelResults;
+
+@Controller
+@RequestMapping("/warranty")
+public class WarrantyController {
+
+	@Autowired
+	private WarrantyService warrantyService;
+	
+	@RequestMapping(value = "/getWarrantyList", method = RequestMethod.POST)
+	@ResponseBody
+	public ModelResults getUserList(
+			@RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "repairsname", required = false) String repairsname,
+			@RequestParam(value = "start", required = false, defaultValue = "0") long start,
+			@RequestParam(value = "end", required = false, defaultValue = "20") long end) throws UnsupportedEncodingException {
+	
+		return  warrantyService.getWarrantyList(id, repairsname, start, end);
+	}
+	
+	
+	
+	/**
+	 * 添加信息
+	 * */
+	@RequestMapping(value="/addWarranty")
+	@ResponseBody
+	public ModelBean addWarranty(
+			@RequestParam(value = "repairsname",required=true)String repairsname,
+			@RequestParam(value = "repairsphone",required=true)String repairsphone,
+			@RequestParam(value = "applycontent",required=true)String applycontent,
+			@RequestParam(value = "applyaddress",required=true)String applyaddress,
+			@RequestParam(value = "repairsdate",required=true)String repairsdate,
+			@RequestParam(value = "applysource", required = true) String applysource,
+			@RequestParam(value = "fj", required = true) String fj
+			){
+		
+		ModelBean bean =new ModelBean();
+		//后台校验非空
+				if(repairsname.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("名称"+ MsgConstant.ISNULL);
+					return bean;
+				}
+				if(repairsphone.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("号码"+ MsgConstant.ISNULL);	
+					return bean;
+				}
+				if(applycontent.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("内容"+ MsgConstant.ISNULL);
+					return bean;
+				}
+				if(applyaddress.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("地址"+ MsgConstant.ISNULL);
+					return bean;
+				}
+				if(applysource.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("申请来源"+ MsgConstant.ISNULL);
+					return bean;
+				}
+				
+				
+	    bean=warrantyService.addWarranty(repairsname,repairsphone,applycontent,applyaddress,repairsdate,applysource,fj);
+		return bean;
+	}
+	
+	
+	/**
+	 * 更新信息
+	 * */
+	@RequestMapping(value="/upWarranty")
+	@ResponseBody
+	public ModelBean upWarranty(
+			@RequestParam(value = "id",required=true)String id,
+			@RequestParam(value = "repairsname",required=true)String repairsname,
+			@RequestParam(value = "repairsphone",required=true)String repairsphone,
+			@RequestParam(value = "applycontent",required=true)String applycontent,
+			@RequestParam(value = "applyaddress",required=true)String applyaddress,
+			@RequestParam(value = "repairsdate",required=true)String repairsdate,
+			@RequestParam(value = "applysource", required = true) String applysource,
+			@RequestParam(value = "fj", required = true) String fj
+			){
+		
+		ModelBean bean =new ModelBean();
+		//后台校验非空
+				if(id.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("编号"+ MsgConstant.ISNULL);
+					return bean;
+				}
+				if(repairsname.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("名称"+ MsgConstant.ISNULL);
+					return bean;
+				}
+				if(repairsphone.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("号码"+ MsgConstant.ISNULL);	
+					return bean;
+				}
+				if(applycontent.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("内容"+ MsgConstant.ISNULL);
+					return bean;
+				}
+				if(applyaddress.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("地址"+ MsgConstant.ISNULL);
+					return bean;
+				}
+				if(applysource.equals("")){
+					bean.setCode(MsgConstant.CODE_INVALID_PARAMS);
+					bean.setMsg("申请来源"+ MsgConstant.ISNULL);
+					return bean;
+				}
+	    bean=warrantyService.upWarranty(id,repairsname,repairsphone,applycontent,applyaddress,repairsdate,applysource,fj);
+		return bean;
+	}
+	
+	
+	/**
+	 * 通过id获取信息
+	 * @param id
+	 * */
+	@RequestMapping(value = "/getWarrantyID")
+	@ResponseBody
+	public ModelBean getWarrantyID(@RequestParam(value = "id")Integer id){
+		ModelBean bean = warrantyService.getWarrantyID(id);
+		return bean;
+	}
+	
+	
+	/**
+	 * 删除
+	 * @param Integer id
+	 * */
+	@RequestMapping(value = "/deWarranty")
+	@ResponseBody
+	public ModelBean deWarranty(@RequestParam(value = "id",required = true)String id){
+		ModelBean bean=warrantyService.deWarranty(id);
+		return bean;
+	}
+	
+	
+	/**
+	 * 删除
+	 * @param Integer id
+	 * */
+	@RequestMapping(value = "/subWarranty")
+	@ResponseBody
+	public ModelBean subWarranty(@RequestParam(value = "id",required = true)String id,
+			@RequestParam(value = "name",required = true)String name,
+			@RequestParam(value = "departid",required = true)String departid,
+			@RequestParam(value = "tijiaodate",required = true)String tijiaodate){
+		ModelBean bean=warrantyService.subWarranty(id,name,departid,tijiaodate);
+		return bean;
+	}
+	
+	
+}

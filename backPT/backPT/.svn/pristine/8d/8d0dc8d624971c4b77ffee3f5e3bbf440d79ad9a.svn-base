@@ -1,0 +1,13 @@
+package com.pt.ssm.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import com.pt.ssm.po.Property;
+
+public interface WarrantyDao {
+
+	List<Map<String, Object>> getWarrantyList(Map<String, Object> paramMap) throws Exception;
+	long getWarrantyListCount(Map<String, Object> paramMap) throws Exception;
+		
+}

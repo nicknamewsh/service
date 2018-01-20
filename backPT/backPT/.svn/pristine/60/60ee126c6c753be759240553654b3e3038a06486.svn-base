@@ -1,0 +1,7 @@
+package com.pt.ssm.service;
+
+import com.pt.ssm.util.ModelResults;
+
+public interface AnnouncementService {
+	ModelResults getDateList(String noticeperson,long page,long size) throws Exception;
+}

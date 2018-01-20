@@ -1,0 +1,67 @@
+package com.pt.ssm.controller;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.pt.ssm.constant.MsgConstant;
+import com.pt.ssm.service.MaintainService;
+import com.pt.ssm.util.ModelBean;
+import com.pt.ssm.util.ModelResults;
+
+@Controller
+@RequestMapping("/maintain")
+public class MaintainController {
+	@Autowired
+	private MaintainService maintainService;
+	
+	
+	
+	@RequestMapping(value = "/getMaintainList", method = RequestMethod.POST)
+	@ResponseBody
+	public ModelResults getMaintainList(
+			@RequestParam(value = "id", required = false) String id,
+			@RequestParam(value = "applyname", required = false) String applyname,
+			@RequestParam(value = "start", required = false, defaultValue = "0") long start,
+			@RequestParam(value = "end", required = false, defaultValue = "20") long end) throws UnsupportedEncodingException {
+	
+		return  maintainService.getMaintainList(id, applyname, start, end);
+	}
+	
+	
+	/**
+	 * 更新信息
+	 * */
+	@RequestMapping(value="/upMaintain")
+	@ResponseBody
+	public ModelBean upMaintain(
+			@RequestParam(value = "id",required=true)String id,
+			@RequestParam(value = "maintainname",required=true)String maintainname,
+			@RequestParam(value = "repairmoney",required=true)String repairmoney,
+			@RequestParam(value = "materialmoney",required=true)String materialmoney,
+			@RequestParam(value = "completecontent",required=true)String completecontent,
+			@RequestParam(value = "maintaindate",required=true)String maintaindate,
+			@RequestParam(value = "archivename",required=true)String archivename
+			){
+		ModelBean bean =new ModelBean();
+	    bean=maintainService.upMaintain(id,maintainname,repairmoney,materialmoney,completecontent,maintaindate,archivename);
+		return bean;
+	}
+	
+	
+	@RequestMapping(value = "/getMaintainId", method = RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> getMaintainId(
+			@RequestParam(value = "id", required = false) String id
+			) throws UnsupportedEncodingException {
+	
+		return  maintainService.getMaintainId(id);
+	}
+	
+}

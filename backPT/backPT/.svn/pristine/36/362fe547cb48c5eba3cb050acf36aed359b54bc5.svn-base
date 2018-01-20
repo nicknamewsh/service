@@ -1,0 +1,27 @@
+package com.pt.ssm.service;
+
+import com.pt.ssm.po.CustomerData;
+import com.pt.ssm.util.ModelBean;
+import com.pt.ssm.util.ModelResults;
+
+public interface CustomerService {
+
+	ModelResults getCustomerList(long page, long size, String customerName,
+			String danWei, String post);
+
+	ModelBean addCustomerInfo(CustomerData cus);
+
+	ModelBean getCustomerInfoById(Integer id);
+
+	ModelBean updateCustomerInfo(CustomerData cus);
+
+	ModelBean delCustomerInfoByIds(long[] ids);
+
+	ModelResults getCustomerList1(long page, long size, String huXing,
+			String louYu, String beginTime, String endTime);
+
+	ModelBean addCustomerInfo1(CustomerData cus);
+
+	ModelBean updateCustomerInfo1(CustomerData cus);
+
+}

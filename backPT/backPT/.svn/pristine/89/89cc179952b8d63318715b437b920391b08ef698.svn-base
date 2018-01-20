@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pt.ssm.dao.CustomerDao">
+
+	<sql id="getCustomerListWhere">
+		<where>
+			<if test="customerName != null and customerName !=''.toString()">
+			AND Z.customerName LIKE CONCAT('%',CONCAT(#{customerName},'%'))
+			</if>
+			
+			<if test="danWei != null and danWei !=''.toString()">
+			AND Z.danWei LIKE CONCAT('%',CONCAT(#{danWei},'%'))
+			</if>
+			
+			<if test="post != null and post !=''.toString()">
+			AND Z.post LIKE CONCAT('%',CONCAT(#{post},'%'))
+			</if>
+			
+			<if test="huXing != null and huXing !=''.toString()">
+			AND Z.huXing LIKE CONCAT('%',CONCAT(#{huXing},'%'))
+			</if>
+			
+			<if test="loudong != null and loudong !=''.toString()">
+			AND Z.loudong LIKE CONCAT('%',CONCAT(#{loudong},'%'))
+			</if>
+			
+			<if test="louhao != null and louhao !=''.toString()">
+			AND Z.louhao LIKE CONCAT('%',CONCAT(#{louhao},'%'))
+			</if>
+			
+			
+		
+		</where>
+	</sql>
+	<select id="getCustomerList" parameterType="map" resultType="map">
+	  SELECT id,customername,sex,danwei,post, email,wangzhan,mobilephone,telephone,companyphone,fax,qqhao FROM(
+  SELECT z.id,z.customername,(case when z.customergender = 0 then '男' else '女' end) sex,z.danwei,z.post,
+  z.email,z.wangzhan,z.mobilephone,z.telephone,z.companyphone,z.fax,z.qqhao ,rownum RN from pt_customerdata z
+     <include refid="getCustomerListWhere"></include>
+  ) WHERE RN BETWEEN #{page} AND #{pageSize}
+	</select>
+	
+	
+	<select id="getCustomerList1" parameterType="map" resultType="map">
+	  SELECT id,customername,registeradress,registernunber,registermoney,frzm,nsrzm,enterprisenumber,(case when isCome &lt;= 0  then '已到期'  when (isCome &gt; 0 and isCome &lt;=30) then '近期到期' else '' end) isCome,gsxz,
+ enterprisexz,enterprisess,kaishi,jieshu,huxing,loudong,louhao,tc,hys,nbbj,zwzl,dk,cyfw,wxfw,mobilePhone,RN FROM
+ (SELECT id,customername,registeradress,registernunber,registermoney,frzm,nsrzm,enterprisenumber,ceil((To_date(jieshu , 'yyyy-mm-dd') - To_date(nowTime, 'yyyy-mm-dd'))) isCome,gsxz,
+ enterprisexz,enterprisess,kaishi,jieshu,huxing,loudong,louhao,tc,hys,nbbj,zwzl,dk,cyfw,wxfw,mobilePhone,RN FROM
+  (select z.id,z.customername,z.registeradress,z.registernunber,z.registermoney,z.frzm,z.nsrzm,z.enterprisenumber,
+  (case when z.enterprisexz = 1 then '国有企业' when z.enterprisexz = 2 then '三资企业' when z.enterprisexz = 3 then '集体企业' when z.enterprisexz = 4 then '私营企业' else '' end) gsxz,z.enterprisexz,
+  z.enterprisess,to_char(sysdate,'yyyy-mm-dd') nowTime,to_Char(z.kaishi,'yyyy-mm-dd') kaishi,to_Char(z.jieshu,'yyyy-mm-dd') jieshu,z.huxing,z.loudong,z.louhao,
+  z.tc,z.hys,z.nbbj,z.zwzl,z.dk,z.cyfw,z.wxfw,z.mobilePhone,rownum RN  from pt_customerdata z
+  <include refid="getCustomerListWhere"></include>
+  )order by isCome
+  ) WHERE RN BETWEEN #{page} AND #{pageSize}
+	</select>
+	
+	<select id="getCustomerListCount" parameterType="map" resultType="long">
+	SELECT COUNT(1) FROM pt_customerdata Z
+	<include refid="getCustomerListWhere"></include>
+	</select>	
+	
+	
+	
+	
+	<select id="getCustomerInfoById" parameterType="map" resultType="customerData">
+		SELECT ID,CUSTOMERNAME,UNIT,REGISTERADRESS,REGISTERNUNBER,
+		REGISTERMONEY,ENTERPRISEXZ,ENTERPRISESS,MOBILEPHONE,to_Char(KAISHI,'yyyy-mm-dd') KAISHI,to_Char(JIESHU,'yyyy-mm-dd') JIESHU,
+		LOUDONG,LOUHAO,CONTRACTNO,RENTINCREA,RENT,PROPERTY,CARS,to_Char(CARSSTA,'yyyy-mm-dd') CARSSTA,to_Char(CARSEND,'yyyy-mm-dd') CARSEND
+		,CARSMONEY,DEPOSIT,SFZX,ZXBZJ,AREA,TC
+		,HYS,NBBJ,ZWZL,DK,CYFW,WXFW,FRZM,NSRZM,IMGINFO,HTURL,ZXURL,HUXING  from pt_customerdata 
+   		 where id = #{id}
+	</select>
+	
+	
+	<select id="getCustomerInfoByLouHao" parameterType="map" resultType="customerData">
+		select id,louhao,loudong,area,allArea from(
+		select id,louhao,loudong,area from pt_customerdata z <include refid="getCustomerListWhere"></include>
+		) a
+		left join(
+		select sum(area) allArea from pt_customerdata z <include refid="getCustomerListWhere"></include>
+		)b 
+		on 1 =1 
+	</select>
+	
+	
+	<insert id="addCustomerInfo" parameterType="customerData">
+		insert into pt_customerdata(id,customername,customerGender,danwei,post,email,wangzhan,mobilephone,telephone,companyphone,fax,qqhao)
+		values(
+		seq_customerdata.nextval,#{customerName,jdbcType=VARCHAR},#{customerGender,jdbcType=NUMERIC},
+       						 #{danWei,jdbcType=VARCHAR}, #{post,jdbcType=VARCHAR},#{email,jdbcType=VARCHAR},
+       						 #{wangzhan,jdbcType=VARCHAR}, #{mobilePhone,jdbcType=VARCHAR}, #{telePhone,jdbcType=VARCHAR},
+       						 #{companyPhone,jdbcType=VARCHAR},#{fax,jdbcType=VARCHAR},#{QQHao,jdbcType=VARCHAR}
+       						 )
+	</insert>
+	
+	
+	<insert id="addCustomer" parameterType="map">
+		insert into pt_customerdata(
+		ID,CUSTOMERNAME,UNIT,REGISTERADRESS,REGISTERNUNBER,
+		REGISTERMONEY,ENTERPRISEXZ,ENTERPRISESS,MOBILEPHONE,KAISHI,JIESHU,
+		LOUDONG,LOUHAO,CONTRACTNO,RENTINCREA,RENT,PROPERTY,CARS,CARSSTA,CARSEND
+		,CARSMONEY,DEPOSIT,SFZX,ZXBZJ,AREA,TC
+		,HYS,NBBJ,ZWZL,DK,CYFW,WXFW,FRZM,NSRZM,IMGINFO,HTURL,ZXURL,HUXING)
+		values(
+		seq_customerdata.nextval,
+		#{customerName,jdbcType=VARCHAR},#{unit,jdbcType=VARCHAR},#{registerAdress,jdbcType=VARCHAR},#{registerNumber,jdbcType=VARCHAR},
+		#{registerMoney,jdbcType=NUMERIC},#{enterprisexz,jdbcType=NUMERIC},
+		#{enterprisess,jdbcType=NUMERIC},#{mobilePhone,jdbcType=VARCHAR},to_date(#{kaiShi,jdbcType=VARCHAR},'yyyy-mm-dd'),to_date(#{jieShu,jdbcType=VARCHAR},'yyyy-mm-dd'),
+		#{loudong,jdbcType=VARCHAR},#{louhao,jdbcType=VARCHAR},#{contractno,jdbcType=VARCHAR},#{rentincrea,jdbcType=VARCHAR},#{rent,jdbcType=NUMERIC},
+		#{property,jdbcType=NUMERIC},#{cars,jdbcType=NUMERIC},
+		to_date(#{carssta,jdbcType=VARCHAR},'yyyy-mm-dd'),to_date(#{carsend,jdbcType=VARCHAR},'yyyy-mm-dd'),
+		#{carsmoney,jdbcType=NUMERIC},#{deposit,jdbcType=NUMERIC},#{sfzx,jdbcType=NUMERIC},#{zxbzj,jdbcType=NUMERIC},
+		#{area,jdbcType=NUMERIC},#{tc,jdbcType=NUMERIC},#{hys,jdbcType=NUMERIC}
+		,#{nbbj,jdbcType=NUMERIC},#{zwzl,jdbcType=NUMERIC},#{dk,jdbcType=NUMERIC},#{cyfw,jdbcType=NUMERIC},
+		#{wxfw,jdbcType=NUMERIC},#{frzm,jdbcType=VARCHAR},#{nsrzm,jdbcType=VARCHAR},#{imginfo,jdbcType=VARCHAR},
+		#{hturl,jdbcType=VARCHAR},#{zxurl,jdbcType=VARCHAR},#{huXing,jdbcType=VARCHAR}
+       						 )
+	</insert>
+	
+	
+	<update id="updateCustomerInfo1" parameterType="map">
+		update pt_customerdata 
+		set  
+		
+		CUSTOMERNAME=#{customerName,jdbcType=VARCHAR},
+		UNIT=#{unit,jdbcType=VARCHAR},
+		REGISTERADRESS=#{registerAdress,jdbcType=VARCHAR},
+		REGISTERNUNBER=#{registerNumber,jdbcType=VARCHAR},
+		REGISTERMONEY=#{registerMoney,jdbcType=NUMERIC},
+		ENTERPRISEXZ=#{enterprisexz,jdbcType=NUMERIC},
+		MOBILEPHONE=#{mobilePhone,jdbcType=VARCHAR},
+		KAISHI=to_date(#{kaiShi,jdbcType=VARCHAR},'yyyy-mm-dd'),
+		JIESHU=to_date(#{jieShu,jdbcType=VARCHAR},'yyyy-mm-dd'),
+		LOUDONG=#{loudong,jdbcType=VARCHAR},
+		LOUHAO=#{louhao,jdbcType=VARCHAR},
+		CONTRACTNO=#{contractno,jdbcType=VARCHAR},
+		RENTINCREA=#{rentincrea,jdbcType=VARCHAR},
+		RENT=#{rent,jdbcType=NUMERIC},
+		PROPERTY=#{property,jdbcType=NUMERIC},
+		CARS=#{cars,jdbcType=NUMERIC},
+		CARSSTA=to_date(#{carssta,jdbcType=VARCHAR},'yyyy-mm-dd'),
+		CARSEND=to_date(#{carsend,jdbcType=VARCHAR},'yyyy-mm-dd'),
+		DEPOSIT=#{deposit,jdbcType=NUMERIC},
+		SFZX=#{sfzx,jdbcType=NUMERIC},
+		AREA=#{area,jdbcType=NUMERIC},
+		TC=#{tc,jdbcType=NUMERIC},
+		HYS=#{hys,jdbcType=NUMERIC},
+		NBBJ=#{nbbj,jdbcType=NUMERIC},
+		ZWZL=#{zwzl,jdbcType=NUMERIC},
+		DK=#{dk,jdbcType=NUMERIC},
+		CYFW=#{cyfw,jdbcType=NUMERIC},
+		WXFW=#{wxfw,jdbcType=NUMERIC},
+		FRZM=#{frzm,jdbcType=VARCHAR},
+		NSRZM=#{nsrzm,jdbcType=VARCHAR},
+		IMGINFO=#{imginfo,jdbcType=VARCHAR},
+		HTURL=#{hturl,jdbcType=VARCHAR},
+		ZXURL=#{zxurl,jdbcType=VARCHAR},
+		<if test="zxbzj != null and zxbzj != ''">
+				ZXBZJ=#{zxbzj,jdbcType=NUMERIC},
+		</if>
+		<if test="enterprisess != null and enterprisess != ''">
+				ENTERPRISESS=#{enterprisess,jdbcType=NUMERIC},
+		</if>
+		<if test="carsmoney != null and carsmoney != ''">
+				CARSMONEY=#{carsmoney,jdbcType=NUMERIC},
+		</if>
+		HUXING=#{huXing,jdbcType=VARCHAR}
+
+		
+		where id = #{id}
+	</update>
+	
+	
+	<update id="updateCustomerInfo" parameterType="customerData">
+		update pt_customerdata 
+		set customerName = #{customerName,jdbcType=VARCHAR},customerGender = #{customerGender,jdbcType=NUMERIC},
+		    danWei = #{danWei,jdbcType=VARCHAR}, post = #{post,jdbcType=VARCHAR}, email = #{email,jdbcType=VARCHAR},
+		    wangzhan = #{wangzhan,jdbcType=VARCHAR}, mobilePhone = #{mobilePhone,jdbcType=VARCHAR}, telePhone = #{telePhone,jdbcType=VARCHAR},
+		    companyPhone = #{companyPhone,jdbcType=VARCHAR}, fax = #{fax,jdbcType=VARCHAR}, QQHao = #{QQHao,jdbcType=VARCHAR}
+		where id = #{id}
+	</update>
+	
+	
+	<delete id="delCustomerInfoByIds" parameterType="int">
+		DELETE FROM pt_customerdata WHERE id in 
+		<foreach collection="array" item="list" open="(" separator="," close=")">
+		#{list}
+		</foreach>
+	</delete>
+</mapper>
