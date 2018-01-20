@@ -1,5 +1,7 @@
 package com.firstspringcloud.springclouddemo.controller;
 
+import com.firstspringcloud.springclouddemo.util.BuinessException;
+import com.firstspringcloud.springclouddemo.util.ExceptionUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +29,15 @@ public class TestController {
     @RequestMapping("/get_random_port")
     public String get_random_port(){
         logger.info("========================================获取随机端口号======================================");
+        int a = 1/0;
         return this.port;
+    }
+
+    /**
+     * 自定义异常处理测试
+     * */
+    @RequestMapping("/testException")
+    public String testException(){
+        throw new BuinessException(100,"用户名或密码错误！");
     }
 }
