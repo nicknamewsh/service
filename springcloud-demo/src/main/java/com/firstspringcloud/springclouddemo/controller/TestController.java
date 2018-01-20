@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     @Value("${test.tt}")
     private String msg;
+    @Value("${server.port}")
+    private String port;
     @RequestMapping("/test")
     public String test(){
         return msg;
@@ -17,5 +19,10 @@ public class TestController {
     @RequestMapping("/tt")
     public String tt(){
         return "tt";
+    }
+    //获取随机端口号
+    @RequestMapping("/get_random_port")
+    public String get_random_port(){
+        return this.port;
     }
 }
